@@ -2,6 +2,7 @@ package uk.ac.tees.cis2003.W9083319;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
@@ -51,6 +52,11 @@ public class AddJobs extends AppCompatActivity {
         AddJob addJob  = new AddJob();
         addJob.execute();
     }
+
+    public void SeeAllJobs_click(View view) {
+        startActivity(new Intent(AddJobs.this, DisplayJobs.class));
+    }
+
     public class AddJob extends AsyncTask<String, String, String> {
         String message = "";
 
