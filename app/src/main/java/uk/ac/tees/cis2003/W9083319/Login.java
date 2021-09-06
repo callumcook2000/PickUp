@@ -55,6 +55,7 @@ public class Login extends AppCompatActivity {
 
         Login.LoginAccount loginAccount = new Login.LoginAccount();
         loginAccount.execute();
+        startActivity(new Intent(Login.this, AddJobs.class));
     }
     public class LoginAccount extends AsyncTask<String, String, String> {
         String message = "";
