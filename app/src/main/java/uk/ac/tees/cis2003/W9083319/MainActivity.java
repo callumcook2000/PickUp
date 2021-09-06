@@ -3,16 +3,19 @@ package uk.ac.tees.cis2003.W9083319;
 import androidx.appcompat.app.AppCompatActivity;
 import java.sql.Connection;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.lang.ClassNotFoundException;
 
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -34,7 +37,7 @@ public class MainActivity extends AppCompatActivity {
         try
         {
             Class.forName("net.sourceforge.jtds.jdbc.Driver");
-            ConnectionURL = "jdbc:jtds:sqlserver://pick-up-app.database.windows.net:1433;DatabaseName=User;user=w9083319@pick-up-app;password=;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;ssl=request;";
+            ConnectionURL = "jdbc:jtds:sqlserver://pick-up-app.database.windows.net:1433;DatabaseName=User;user=w9083319@pick-up-app;password=Cal1ben2@aron345;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;ssl=request;";
             connection = DriverManager.getConnection(ConnectionURL);
         }
         catch (SQLException | ClassNotFoundException se)
@@ -47,32 +50,74 @@ public class MainActivity extends AppCompatActivity {
         return connection;
     }
 
-    public void btnclick(View view)
+    public void register_btn_click(View view)
     {
+        RegisterAccount registerAccount = new RegisterAccount();
+        registerAccount.execute();
 
-        TextView textView = (TextView)findViewById(R.id.textView1);
-
-
-        try{
-            con = connectionclass();
-            if (con == null)
-            {
-                textView.setText("con is null");
-            }
-            else
-            {
-                String query = "select * from User";
-                Statement stmt = con.createStatement();
-                ResultSet rs = stmt.executeQuery(query);
-                textView.setText("Success");
-
-            }
-        }
-        catch ( Exception ex)
-        {
-            Log.e("error:", ex.getMessage());
-        }
 
     }
+
+    public class RegisterAccount extends AsyncTask<String, String, String> {
+        String message = "";
+
+
+        @Override
+        protected String doInBackground(String... strings) {
+            /*Registration Page */
+            EditText editFullName = findViewById(R.id.FullName_txtbx);
+            EditText editAddress = findViewById(R.id.Address_txtbx);
+            EditText editPostcode = findViewById(R.id.Postcode_txtbx2);
+            EditText editDOB = findViewById(R.id.DOB_txtbx3);
+            EditText editUsername = findViewById(R.id.Username_txtbx);
+            EditText editPassword = findViewById(R.id.Password_txtbx);
+
+
+            try {
+                con= connectionclass();
+                if (con == null) {
+                    message = "Check your internet access";
+                } else {
+                    PreparedStatement insertStatement = con.prepareStatement("INSERT INTO [dbo].[User] (Username, FullName, Password, Address, PostCode, DOB) VALUES (?, ?, ?, ?, ?, ?)");
+
+                    insertStatement.setString(1, String.valueOf(editUsername.getText()));
+                    insertStatement.setString(2, String.valueOf(editFullName.getText()));
+                    insertStatement.setString(3, String.valueOf(editPassword.getText()));
+                    insertStatement.setString(4, String.valueOf(editAddress.getText()));
+                    insertStatement.setString(5, String.valueOf(editPostcode.getText()));
+                    insertStatement.setInt(6, Integer.parseInt(String.valueOf(editDOB.getText())));
+
+
+                    insertStatement.executeUpdate();
+                    message = "INSERT INTO success";
+
+                    con.close();
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+
+            return message;
+        }
+    }
+  //try{
+  //      con = connectionclass();
+  //      if (con == null)
+  //      {
+  //
+  //      }
+  //      else
+  //      {
+  //          String query = "select * from [dbo].[User]";
+  //          Statement stmt = con.createStatement();
+  //          ResultSet rs = stmt.executeQuery(query);
+  //          //textView.setText(rs.getString("FullName"));
+  //
+  //      }
+  //  }
+  //      catch ( Exception ex)
+  //  {
+  //      Log.e("error:", ex.getMessage());
+  //  }
 
 }
