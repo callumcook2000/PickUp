@@ -1,51 +1,94 @@
 package uk.ac.tees.cis2003.W9083319;
 
-import android.os.Bundle;
-
-import com.google.android.material.snackbar.Snackbar;
-
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
+import android.os.AsyncTask;
+import android.os.Bundle;
+import android.os.StrictMode;
+import android.util.Log;
 import android.view.View;
+import android.widget.EditText;
 
-import androidx.navigation.NavController;
-import androidx.navigation.Navigation;
-import androidx.navigation.ui.AppBarConfiguration;
-import androidx.navigation.ui.NavigationUI;
-
-import uk.ac.tees.cis2003.W9083319.databinding.ActivityLoginBinding;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 
 public class Login extends AppCompatActivity {
 
-    private AppBarConfiguration appBarConfiguration;
-    private ActivityLoginBinding binding;
-
+    public Connection con;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        binding = ActivityLoginBinding.inflate(getLayoutInflater());
-        setContentView(binding.getRoot());
-
-        setSupportActionBar(binding.toolbar);
-
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_login);
-        appBarConfiguration = new AppBarConfiguration.Builder(navController.getGraph()).build();
-        NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
-
-        binding.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
+        setContentView(R.layout.activity_login);
     }
 
-    @Override
-    public boolean onSupportNavigateUp() {
-        NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_login);
-        return NavigationUI.navigateUp(navController, appBarConfiguration)
-                || super.onSupportNavigateUp();
+    public Connection connectionclass()
+    {
+
+        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        StrictMode.setThreadPolicy(policy);
+        Connection connection = null;
+        String ConnectionURL = null;
+        try
+        {
+            Class.forName("net.sourceforge.jtds.jdbc.Driver");
+            ConnectionURL = "jdbc:jtds:sqlserver://pick-up-app.database.windows.net:1433;DatabaseName=User;user=w9083319@pick-up-app;password=Cal1ben2@aron345;encrypt=true;trustServerCertificate=false;hostNameInCertificate=*.database.windows.net;loginTimeout=30;ssl=request;";
+            connection = DriverManager.getConnection(ConnectionURL);
+        }
+        catch (SQLException | ClassNotFoundException se)
+        {
+            Log.e("error:", se.getMessage());
+
+
+        }
+
+        return connection;
+    }
+
+    public void register_btn_click(View view) {
+        startActivity(new Intent(Login.this, MainActivity.class));
+    }
+
+    public void Login_btn_click(View view) {
+
+        Login.LoginAccount loginAccount = new Login.LoginAccount();
+        loginAccount.execute();
+    }
+    public class LoginAccount extends AsyncTask<String, String, String> {
+        String message = "";
+
+
+        @Override
+        protected String doInBackground(String... strings) {
+            /*Registration Page */
+            EditText editUsername = findViewById(R.id.UserName_txtbx);
+            EditText editPassword = findViewById(R.id.Password_txtbx);
+
+
+            try {
+                con= connectionclass();
+                if (con == null) {
+                    message = "Bad connection";
+                } else {
+                    PreparedStatement selectStatement = con.prepareStatement("SELECT * FROM [dbo].[User] WHERE (Username = ? OR Password = ?)");
+
+                    selectStatement.setString(1, String.valueOf(editUsername.getText()));
+                    selectStatement.setString(2, String.valueOf(editPassword.getText()));
+
+
+
+                    selectStatement.executeUpdate();
+                    message = "Login success";
+
+                    con.close();
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
+
+            return message;
+        }
     }
 }

@@ -10,11 +10,13 @@ import java.sql.Statement;
 import java.lang.ClassNotFoundException;
 
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -26,7 +28,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
     }
+
+
+
     public Connection connectionclass()
     {
 
@@ -54,8 +60,14 @@ public class MainActivity extends AppCompatActivity {
     {
         RegisterAccount registerAccount = new RegisterAccount();
         registerAccount.execute();
+        startActivity(new Intent(MainActivity.this, Login.class));
 
 
+
+    }
+
+    public void Login_btn_click(View view) {
+        startActivity(new Intent(MainActivity.this, Login.class));
     }
 
     public class RegisterAccount extends AsyncTask<String, String, String> {
@@ -100,24 +112,5 @@ public class MainActivity extends AppCompatActivity {
             return message;
         }
     }
-  //try{
-  //      con = connectionclass();
-  //      if (con == null)
-  //      {
-  //
-  //      }
-  //      else
-  //      {
-  //          String query = "select * from [dbo].[User]";
-  //          Statement stmt = con.createStatement();
-  //          ResultSet rs = stmt.executeQuery(query);
-  //          //textView.setText(rs.getString("FullName"));
-  //
-  //      }
-  //  }
-  //      catch ( Exception ex)
-  //  {
-  //      Log.e("error:", ex.getMessage());
-  //  }
 
 }

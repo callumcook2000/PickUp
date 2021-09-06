@@ -14,10 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.PickUP">
         <activity
+            android:name=".AddJobs"
+            android:exported="true" />
+        <activity
             android:name=".Login"
-            android:exported="true"
-            android:label="@string/title_activity_login"
-            android:theme="@style/Theme.PickUP.NoActionBar" />
+            android:exported="true" />
         <activity
             android:name=".MainActivity"
             android:exported="true" />
